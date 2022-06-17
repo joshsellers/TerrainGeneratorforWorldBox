@@ -2,10 +2,11 @@
 #define _PROGRAM_H
 
 #include "Generator.h"
-#include "Util.h"
+#include "UIButton.h"
+#include "UITextField.h"
 #include <iostream>
 
-class Program {
+class Program : public ButtonListener {
 public:
     Program(const int windowWidth, const int windowHeight);
 
@@ -14,13 +15,42 @@ public:
 
     void keyPressed(const sf::Keyboard::Key& key);
     void keyReleased(const sf::Keyboard::Key& key);
+
+    void mouseButtonPressed(const int mx, const int my);
+    void mouseButtonReleased(const int mx, const int my);
+    void mouseMoved(const int mx, const int my);
+
+    void textEntered(sf::Uint32 character);
+
+    void buttonPressed(std::string buttonCode);
+
+    void uiSetup();
+
 private:
-    int _windowWidth, _windowHeight;
+    void generate();
 
     Generator _generator;
 
     sf::Texture _terrainTexture;
     sf::Sprite _terrainSprite;
+
+    sf::RectangleShape _background;
+
+    sf::RectangleShape _progBarBg;
+    sf::RectangleShape _progBar;
+    float _progBarMaxWidth = 0;
+
+    std::vector<std::shared_ptr<UIElement>> _uiElements;
+    std::vector<std::shared_ptr<UITextField>> _textFields;
+
+    sf::Font _font;
+
+    std::shared_ptr<UITextField> _seedField;
+    std::shared_ptr<UITextField> _sizeField;
+    std::shared_ptr<UITextField> _octavesField;
+    std::shared_ptr<UITextField> _sampleRateField;
+    std::shared_ptr<UITextField> _warpSizeField;
+    std::shared_ptr<UITextField> _warpStrengthField;
 };
 
 #endif

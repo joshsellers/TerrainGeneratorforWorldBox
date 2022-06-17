@@ -1,1 +1,1 @@
-$ Terrain generator for WorldBox
+# Terrain generator for WorldBox

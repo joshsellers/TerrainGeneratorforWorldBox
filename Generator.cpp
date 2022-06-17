@@ -1,48 +1,59 @@
 #include "Generator.h"
+#include <iostream>
 
 Generator::Generator(const siv::PerlinNoise::seed_type seed) {
     _seed = seed;
 }
 
-const sf::Image Generator::generate() const {
-    std::vector<double> data(_size*_size);
+const sf::Image Generator::generate() {
+    _isGenerating = true;
+
+    std::vector<double> data(size*size);
 
     const siv::PerlinNoise perlin{ _seed };
 
-    double warpSize = 4;
-    double warpStrength = 0.8;
-
-    for (int y = 0; y < _size; y++) {
-        for (int x = 0; x < _size; x++) {
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
             double warpNoise = perlin.octave2D_01(
-                warpSize*((double)x * _sampleRate), 
-                warpSize*((double)y * _sampleRate), _octaves
+                warpSize*((double)x * sampleRate), 
+                warpSize*((double)y * sampleRate), octaves
             );
             double noise = perlin.octave3D_01(
-                (x) *_sampleRate, (y) *_sampleRate, 
-                warpStrength * warpNoise, _octaves
+                (x) *sampleRate, (y) *sampleRate, 
+                warpStrength * warpNoise, octaves
             );
 
-            data[x + y * _size] = noise;
+            data[x + y * size] = noise;
+
+            _progress = ((float)(x + y * size) / (float)(size * size));
         }
     }
 
     return process(data);
 }
 
-const sf::Image Generator::process(const std::vector<double>& data) const {
-    sf::Image image;
-    image.create(_size, _size, sf::Color::Black);
+float Generator::getProgress() const {
+    return _progress;
+}
 
-    for (int y = 0; y < _size; y++) {
-        for (int x = 0; x < _size; x++) {
-            sf::Uint32 val = 0xFF * data[x + y * _size];
+bool Generator::isGenerating() const {
+    return _isGenerating;
+}
+
+const sf::Image Generator::process(const std::vector<double>& data) {
+    sf::Image image;
+    image.create(size, size, sf::Color::Black);
+
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            sf::Uint32 val = 0xFF * data[x + y * size];
             sf::Uint32 color = val;
             color = ((color << 8) + val << 8) + val;
             image.setPixel(x, y, sf::Color((color << 8) + 0xFF));
         }
     }
 
+    _isGenerating = false;
     return image;
 }
 
@@ -54,10 +65,10 @@ const siv::PerlinNoise::seed_type Generator::getSeed() {
     return _seed;
 }
 
-void Generator::setSize(int size) {
-    _size = size;
+void Generator::setSize(int newSize) {
+    size = newSize;
 }
 
 const int Generator::getSize() {
-    return _size;
+    return size;
 }

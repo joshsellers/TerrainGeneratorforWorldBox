@@ -1,9 +1,8 @@
-#include <string>
 #include "Program.h"
 
 
 int main() {
-    std::string VERSION = "0.1";
+    std::string VERSION = "0.5";
     int WIDTH = sf::VideoMode::getDesktopMode().width / 1.5;
     int HEIGHT = sf::VideoMode::getDesktopMode().height / 1.5;
 
@@ -34,6 +33,24 @@ int main() {
                     break;
                 case sf::Event::KeyReleased:
                     program.keyReleased(event.key.code);
+                    break;
+                case sf::Event::MouseButtonPressed:
+                    program.mouseButtonPressed(
+                        event.mouseButton.x, event.mouseButton.y
+                    );
+                    break;
+                case sf::Event::MouseButtonReleased:
+                    program.mouseButtonReleased(
+                        event.mouseButton.x, event.mouseButton.y
+                    );
+                    break;
+                case sf::Event::MouseMoved:
+                    program.mouseMoved(
+                        event.mouseMove.x, event.mouseMove.y
+                    );
+                    break;
+                case sf::Event::TextEntered:
+                    program.textEntered(event.text.unicode);
                     break;
             }
         }

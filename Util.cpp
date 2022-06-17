@@ -13,3 +13,14 @@ long long currentTimeMillis() {
 
     return millis.count();
 }
+
+std::string trimString(std::string str) {
+    if (str.find(".") != std::string::npos) {
+        for (std::string::size_type s = str.length() - 1; s > 0; --s) {
+            if (str[s - 1] == '.') break;
+            else if (str[s] == '0') str.erase(s, 1);
+            else break;
+        }
+    }
+    return str;
+}
