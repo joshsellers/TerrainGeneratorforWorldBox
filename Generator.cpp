@@ -46,10 +46,31 @@ const sf::Image Generator::process(const std::vector<double>& data) {
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
-            sf::Uint32 val = 0xFF * data[x + y * size];
-            sf::Uint32 color = val;
-            color = ((color << 8) + val << 8) + val;
-            image.setPixel(x, y, sf::Color((color << 8) + 0xFF));
+            double val = data[x + y * size];
+
+            sf::Uint32 rgb = 0x00;
+
+            if (val >= seaLevel + mountainMidRange + mountainHighRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::MOUNTAIN_HIGH;
+            } else if (val >= seaLevel + mountainLowRange + mountainMidRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::MOUNTAIN_MID;
+            } else if (val >= seaLevel + dirtHighRange + mountainLowRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::MOUNTAIN_LOW;
+            } else if (val >= seaLevel + sandRange + dirtHighRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH;
+            } else if (val >= seaLevel + sandRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::DIRT_LOW;
+            } else if (val > seaLevel && val < seaLevel + sandRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::SAND;
+            } else if (val > seaLevel - oceanShallowRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::WATER_SHALLOW;
+            } else if (val > seaLevel - oceanMidRange) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::WATER_MID;
+            } else if (val < seaLevel) {
+                rgb = (sf::Uint32)TERRAIN_COLOR::WATER_DEEP;
+            }
+                    
+            image.setPixel(x, y, sf::Color((rgb << 8) + 0xFF));
         }
     }
 

@@ -78,6 +78,11 @@ void Program::uiSetup() {
     );
     _uiElements.push_back(generateButton);
 
+    std::shared_ptr<UIButton> saveButton = std::shared_ptr<UIButton>(
+        new UIButton(15, 2, 8, 10, 5, 4.3, "Save", _font, this, "save")
+        );
+    _uiElements.push_back(saveButton);
+
 
     // TEXT FIELDS
 
@@ -142,6 +147,89 @@ void Program::uiSetup() {
     _warpStrengthField->setEmptyValue(_generator.warpStrength);
     _textFields.push_back(_warpStrengthField);
     _uiElements.push_back(_warpStrengthField);
+
+    _seaLevelField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 45, 20, 10, 12, 4.3,
+            std::to_string(_generator.seaLevel), "sea level: ", _font
+        )
+        );
+    _seaLevelField->setEmptyValue(_generator.seaLevel);
+    _textFields.push_back(_seaLevelField);
+    _uiElements.push_back(_seaLevelField);
+
+    _oceanMidRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 50, 20, 10, 12, 4.3,
+            std::to_string(_generator.oceanMidRange), "ocean mid: ", _font
+        )
+        );
+    _oceanMidRangeField->setEmptyValue(_generator.oceanMidRange);
+    _textFields.push_back(_oceanMidRangeField);
+    _uiElements.push_back(_oceanMidRangeField);
+
+    _oceanShallowRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 55, 20, 10, 12, 4.3,
+            std::to_string(_generator.oceanShallowRange), "shallows: ", _font
+        )
+        );
+    _oceanShallowRangeField->setEmptyValue(_generator.oceanShallowRange);
+    _textFields.push_back(_oceanShallowRangeField);
+    _uiElements.push_back(_oceanShallowRangeField);
+
+    _sandRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 60, 20, 10, 12, 4.3,
+            std::to_string(_generator.sandRange), "sand: ", _font
+        )
+        );
+    _sandRangeField->setEmptyValue(_generator.sandRange);
+    _textFields.push_back(_sandRangeField);
+    _uiElements.push_back(_sandRangeField);
+
+    _dirtHighRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 65, 20, 10, 12, 4.3,
+            std::to_string(_generator.dirtHighRange), "dirt: ", _font
+        )
+        );
+    _dirtHighRangeField->setEmptyValue(_generator.dirtHighRange);
+    _textFields.push_back(_dirtHighRangeField);
+    _uiElements.push_back(_dirtHighRangeField);
+
+    _mountainLowRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 70, 20, 10, 12, 4.3,
+            std::to_string(_generator.mountainLowRange), "mountain low: ", 
+            _font
+        )
+        );
+    _mountainLowRangeField->setEmptyValue(_generator.mountainLowRange);
+    _textFields.push_back(_mountainLowRangeField);
+    _uiElements.push_back(_mountainLowRangeField);
+
+    _mountainMidRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 75, 20, 10, 12, 4.3,
+            std::to_string(_generator.mountainMidRange), "mountain high: ",
+            _font
+        )
+        );
+    _mountainMidRangeField->setEmptyValue(_generator.mountainMidRange);
+    _textFields.push_back(_mountainMidRangeField);
+    _uiElements.push_back(_mountainMidRangeField);
+
+    _mountainHighRangeField = std::shared_ptr<UITextField>(
+        new UITextField(
+            xPos, 80, 20, 10, 12, 4.3,
+            std::to_string(_generator.mountainHighRange), "snow caps: ",
+            _font
+        )
+        );
+    _mountainHighRangeField->setEmptyValue(_generator.mountainHighRange);
+    _textFields.push_back(_mountainHighRangeField);
+    _uiElements.push_back(_mountainHighRangeField);
 }
 
 void Program::update() {
@@ -206,6 +294,60 @@ void Program::textEntered(sf::Uint32 character) {
 void Program::buttonPressed(std::string buttonCode) {
     if (buttonCode == "gen") {
         generate();
+    } else if (buttonCode == "save") {
+        std::string pathStr = "";
+        char* buf = nullptr;
+        size_t sz = 0;
+        if (_dupenv_s(&buf, &sz, "APPDATA") == 0 && buf != nullptr) {
+            std::string temp(buf);
+            pathStr = 
+                std::regex_replace(
+                    temp, std::regex("Roaming"), 
+                    "LocalLow\\mkarpenko\\WorldBox\\saves"
+                );
+            free(buf);
+
+            std::vector<std::string> folders;
+            for (const auto& file 
+                : std::filesystem::directory_iterator(pathStr)) {
+                std::vector<std::string> seglist;
+                std::stringstream pathStream(file.path().string());
+                std::string segment = "";
+                while (std::getline(pathStream, segment, '\\')) {
+                    seglist.push_back(segment);
+                }
+
+                folders.push_back(seglist.at(seglist.size() - 1));
+            }
+
+            int highest = 0;
+            for (std::string& folder : folders) {
+                if (folder.find("save") != std::string::npos) {
+                    std::string numStr = std::regex_replace(folder, std::regex("save"), "");
+                    int num = std::stoi(numStr);
+                    if (num > highest) highest = num;
+                }
+            }
+
+            pathStr += "\\save" + std::to_string(highest + 1);
+
+            try {
+                if (!std::filesystem::create_directory(pathStr))
+                    std::cerr << "Failed to create a directory\n"; \
+            }
+            catch (const std::exception& e) {
+                std::cerr << e.what() << '\n';
+            }
+
+            if (_generator.generate().saveToFile(pathStr + "\\preview.png")) {
+                std::cout << "Saved to " << pathStr << std::endl;
+            } else {
+                std::cout << "Failed to save" << std::endl;
+            }
+
+        } else {
+            std::cout << "Path retrieval failed" << std::endl;
+        }
     }
 }
 
@@ -227,6 +369,30 @@ void Program::generate() {
 
     _generator.warpStrength = _warpStrengthField->getValue();
     _warpStrengthField->setEmptyValue(_generator.warpStrength);
+
+    _generator.seaLevel = _seaLevelField->getValue();
+    _seaLevelField->setEmptyValue(_generator.seaLevel);
+
+    _generator.oceanMidRange = _oceanMidRangeField->getValue();
+    _oceanMidRangeField->setEmptyValue(_generator.oceanMidRange);
+
+    _generator.oceanShallowRange = _oceanShallowRangeField->getValue();
+    _oceanShallowRangeField->setEmptyValue(_generator.oceanShallowRange);
+
+    _generator.sandRange = _sandRangeField->getValue();
+    _sandRangeField->setEmptyValue(_generator.sandRange);
+
+    _generator.dirtHighRange = _dirtHighRangeField->getValue();
+    _dirtHighRangeField->setEmptyValue(_generator.dirtHighRange);
+
+    _generator.mountainLowRange = _mountainLowRangeField->getValue();
+    _mountainLowRangeField->setEmptyValue(_generator.mountainLowRange);
+
+    _generator.mountainMidRange = _mountainMidRangeField->getValue();
+    _mountainMidRangeField->setEmptyValue(_generator.mountainMidRange);
+
+    _generator.mountainHighRange = _mountainHighRangeField->getValue();
+    _mountainHighRangeField->setEmptyValue(_generator.mountainHighRange);
 
 
     float size = 43;

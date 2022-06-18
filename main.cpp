@@ -2,7 +2,7 @@
 
 
 int main() {
-    std::string VERSION = "0.5";
+    std::string VERSION = "1.1";
     int WIDTH = sf::VideoMode::getDesktopMode().width / 1.5;
     int HEIGHT = sf::VideoMode::getDesktopMode().height / 1.5;
 

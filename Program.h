@@ -5,6 +5,9 @@
 #include "UIButton.h"
 #include "UITextField.h"
 #include <iostream>
+#include <regex>
+#include <filesystem>
+#include <sstream>
 
 class Program : public ButtonListener {
 public:
@@ -51,6 +54,16 @@ private:
     std::shared_ptr<UITextField> _sampleRateField;
     std::shared_ptr<UITextField> _warpSizeField;
     std::shared_ptr<UITextField> _warpStrengthField;
+
+
+    std::shared_ptr<UITextField> _seaLevelField;
+    std::shared_ptr<UITextField> _oceanMidRangeField;
+    std::shared_ptr<UITextField> _oceanShallowRangeField;
+    std::shared_ptr<UITextField> _sandRangeField;
+    std::shared_ptr<UITextField> _dirtHighRangeField;
+    std::shared_ptr<UITextField> _mountainLowRangeField;
+    std::shared_ptr<UITextField> _mountainMidRangeField;
+    std::shared_ptr<UITextField> _mountainHighRangeField;
 };
 
 #endif
