@@ -36,16 +36,16 @@ public:
     double warpStrength = 0.8;
 
     int octaves = 4;
-    int size = 1000;
+    int size = 1500;
     double sampleRate = 0.005;
 
     double seaLevel = 0.5;
 
     double oceanMidRange = 0.045;
     double oceanShallowRange = 0.01;
-    double sandRange = 0.005;
+    double sandRange = 0.02;
     double dirtHighRange = 0.05;
-    double mountainLowRange = 0.05;
+    double mountainLowRange = 0.1;
     double mountainMidRange = 0.1;
     double mountainHighRange = 0.2;
 
