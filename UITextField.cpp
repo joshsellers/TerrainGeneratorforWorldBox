@@ -5,10 +5,13 @@ const sf::Uint32 TF_BORDER_COLOR[] = { 0xA3, 0x62, 0x15 };
 
 UITextField::UITextField(float x, float y, float width, float height, 
     float scaleWidth, float scaleHeight,
-    sf::String labelText, sf::String titleText, sf::Font font) 
+    sf::String labelText, sf::String titleText, sf::Font font, 
+    double* valuePtr) 
     : UIElement(
         x, y, width, height, scaleWidth, scaleHeight, true, true, font
     ) {
+
+    _valuePtr = valuePtr;
 
     float fontSize = 1.5;
     int relativeFontSize = (float)WINDOW_WIDTH * (fontSize / 100);
@@ -126,6 +129,9 @@ void UITextField::deselect() {
     if (_userInput.getSize() == 0) {
         _userInput = trimString(std::to_string(_emptyValue));
         _text.setString(_userInput);
+    } else {
+        *_valuePtr = (double)getValue();
+        _emptyValue = getValue();
     }
 }
 

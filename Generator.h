@@ -26,17 +26,13 @@ public:
 
     const sf::Image generate();
 
-    void reseed(const siv::PerlinNoise::seed_type seed);
-    const siv::PerlinNoise::seed_type getSeed();
-
-    void setSize(int size);
-    const int getSize();
-
     double warpSize = 4;
     double warpStrength = 0.8;
 
-    int octaves = 4;
-    int size = 1500;
+    double seed; // cast to siv::PerlinNoise::seed_type
+
+    double octaves = 4; // cast to int 
+    double size = 1500; // cast to int
     double sampleRate = 0.005;
 
     double seaLevel = 0.5;
@@ -53,8 +49,6 @@ public:
     bool isGenerating() const;
 
 private:
-    siv::PerlinNoise::seed_type _seed;
-
     const sf::Image process(const std::vector<double>& data);
 
     float _progress = 0;

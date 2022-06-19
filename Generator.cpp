@@ -2,30 +2,34 @@
 #include <iostream>
 
 Generator::Generator(const siv::PerlinNoise::seed_type seed) {
-    _seed = seed;
+    this->seed = (double)seed;
 }
 
 const sf::Image Generator::generate() {
     _isGenerating = true;
 
-    std::vector<double> data(size*size);
+    int intSize = (int)size;
+    int intOctaves = (int)octaves;
 
-    const siv::PerlinNoise perlin{ _seed };
+    std::vector<double> data(intSize * intSize);
 
-    for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
+    const siv::PerlinNoise perlin{ (siv::PerlinNoise::seed_type)seed };
+
+    for (int y = 0; y < intSize; y++) {
+        for (int x = 0; x < intSize; x++) {
             double warpNoise = perlin.octave2D_01(
                 warpSize*((double)x * sampleRate), 
-                warpSize*((double)y * sampleRate), octaves
+                warpSize*((double)y * sampleRate), intOctaves
             );
             double noise = perlin.octave3D_01(
                 (x) *sampleRate, (y) *sampleRate, 
-                warpStrength * warpNoise, octaves
+                warpStrength * warpNoise, intOctaves
             );
 
-            data[x + y * size] = noise;
+            data[x + y * intSize] = noise;
 
-            _progress = ((float)(x + y * size) / (float)(size * size));
+            _progress = 
+                ((float)(x + y * intSize) / (float)(intSize * intSize));
         }
     }
 
@@ -41,12 +45,14 @@ bool Generator::isGenerating() const {
 }
 
 const sf::Image Generator::process(const std::vector<double>& data) {
-    sf::Image image;
-    image.create(size, size, sf::Color::Black);
+    int intSize = (int)size;
 
-    for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
-            double val = data[x + y * size];
+    sf::Image image;
+    image.create(intSize, intSize, sf::Color::Black);
+
+    for (int y = 0; y < intSize; y++) {
+        for (int x = 0; x < intSize; x++) {
+            double val = data[x + y * intSize];
 
             sf::Uint32 rgb = 0x00;
 
@@ -76,20 +82,4 @@ const sf::Image Generator::process(const std::vector<double>& data) {
 
     _isGenerating = false;
     return image;
-}
-
-void Generator::reseed(const siv::PerlinNoise::seed_type seed) {
-    _seed = seed;
-}
-
-const siv::PerlinNoise::seed_type Generator::getSeed() {
-    return _seed;
-}
-
-void Generator::setSize(int newSize) {
-    size = newSize;
-}
-
-const int Generator::getSize() {
-    return size;
 }

@@ -31,6 +31,9 @@ public:
 
 private:
     void generate();
+    void save();
+
+    void addTextField(int xPos, int yPos, std::string label, double* valuePtr);
 
     Generator _generator;
 

@@ -8,7 +8,8 @@ class UITextField : public UIElement {
 public:
     UITextField(float x, float y, float width, float height,
         float scaleWidth, float scaleHeight, 
-        sf::String labelText, sf::String titleText, sf::Font font);
+        sf::String labelText, sf::String titleText, sf::Font font, 
+        double* valuePtr);
 
     void update();
     void draw(sf::RenderTexture& surface);
@@ -28,6 +29,8 @@ public:
 
     sf::FloatRect getBounds();
 private:
+    double* _valuePtr = nullptr;
+
     sf::Text _title;
 
     sf::String _userInput;
