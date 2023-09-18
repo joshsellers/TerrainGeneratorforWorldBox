@@ -17,7 +17,19 @@ enum class TERRAIN_COLOR : sf::Uint32 {
 
     MOUNTAIN_LOW    = 0x5b5e5c,
     MOUNTAIN_MID    = 0x414545,
-    MOUNTAIN_HIGH   = 0xe2edec
+    MOUNTAIN_HIGH   = 0xe2edec,
+
+    GRASS_LOW       = 0x7eaf46,
+    GRASS_HIGH      = 0x54722d,
+
+    SNOW_LOW        = 0xbad5d3,
+    SNOW_HIGH       = 0xd3e4e3,
+
+    SAVANNA_LOW     = 0xf0b121,
+    SAVANNA_HIGH    = 0xcf931b,
+
+    JUNGLE_LOW      = 0x46a052,
+    JUNGLE_HIGH     = 0x1f7020
 };
 
 class Generator {
@@ -49,7 +61,7 @@ public:
     bool isGenerating() const;
 
 private:
-    const sf::Image process(const std::vector<double>& data);
+    const sf::Image process(const std::vector<double>& data, const siv::PerlinNoise& perlin);
 
     float _progress = 0;
     bool _isGenerating = false;

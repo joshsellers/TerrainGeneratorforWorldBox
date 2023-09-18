@@ -33,7 +33,7 @@ const sf::Image Generator::generate() {
         }
     }
 
-    return process(data);
+    return process(data, perlin);
 }
 
 float Generator::getProgress() const {
@@ -44,7 +44,7 @@ bool Generator::isGenerating() const {
     return _isGenerating;
 }
 
-const sf::Image Generator::process(const std::vector<double>& data) {
+const sf::Image Generator::process(const std::vector<double>& data, const siv::PerlinNoise& perlin) {
     int intSize = (int)size;
 
     sf::Image image;
@@ -76,6 +76,49 @@ const sf::Image Generator::process(const std::vector<double>& data) {
                 rgb = (sf::Uint32)TERRAIN_COLOR::WATER_DEEP;
             }
                     
+
+
+            // biomes
+            double xOffset = 20000.;
+            double yOffset = 20000.;
+            int biomeOctaves = 2;
+            float biomeSampleRate = 0.001;
+            double temperatureNoise = perlin.normalizedOctave3D_01((x + xOffset) * biomeSampleRate, (y + yOffset) * biomeSampleRate, 10, biomeOctaves);
+            double precipitationNoise = perlin.normalizedOctave3D_01((x + xOffset) * biomeSampleRate, (y + yOffset) * biomeSampleRate, 40, biomeOctaves);
+
+            float tundraTemp = 0.460 + 0.0075;
+            float tundraPrecLow = 0.240 - 0.0075;
+            float tundraPrecHigh = 0.660 + 0.0075;
+
+            float jungleTemp = 0.540 - 0.0075;
+            float junglePrec = 0.460 + 0.0075;
+
+            float savannaTemp = 0.540 - 0.0075;
+            float savannaPrecLow = 0.315 - 0.0075;
+            float savannaPrecHigh = 0.660 + 0.0075;
+
+            bool tundra = temperatureNoise < tundraTemp&& precipitationNoise >= tundraPrecLow && precipitationNoise < tundraPrecHigh;
+            bool jungle = temperatureNoise > jungleTemp && precipitationNoise < junglePrec;
+            bool savanna = temperatureNoise > savannaTemp && precipitationNoise >= savannaPrecLow && precipitationNoise < savannaPrecHigh;
+
+
+            //std::cout << temperatureNoise << " " << precipitationNoise << std::endl;
+
+            if (rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_LOW || rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH) {
+                bool high = rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH;
+
+                if (tundra) {
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SNOW_LOW : (sf::Uint32)TERRAIN_COLOR::SNOW_LOW;
+                } else if (jungle) {
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::JUNGLE_HIGH : (sf::Uint32)TERRAIN_COLOR::JUNGLE_LOW;
+                } else if (savanna) {
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SAVANNA_HIGH : (sf::Uint32)TERRAIN_COLOR::SAVANNA_HIGH;
+                } else {
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::GRASS_HIGH : (sf::Uint32)TERRAIN_COLOR::GRASS_LOW;
+                }
+            }
+
+
             image.setPixel(x, y, sf::Color((rgb << 8) + 0xFF));
         }
     }
