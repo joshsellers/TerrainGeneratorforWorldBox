@@ -1,5 +1,6 @@
 #include "Generator.h"
 #include <iostream>
+#include <algorithm>
 
 Generator::Generator(const siv::PerlinNoise::seed_type seed) {
     this->seed = (double)seed;
@@ -15,6 +16,31 @@ const sf::Image Generator::generate() {
 
     const siv::PerlinNoise perlin{ (siv::PerlinNoise::seed_type)seed };
 
+    std::vector<double> gradient(intSize * intSize);
+    for (int y = 0; y < intSize; y++) {
+        for (int x = 0; x < intSize; x++) {
+            double midPoint = (double)intSize / 2;
+
+            int xa = x;
+            int ya = y;
+            if (x > intSize / 2) {
+                xa = intSize - x;
+            }
+
+            if (y > intSize / 2) {
+                ya = intSize - y;
+            }
+            xa *= waterEdgeStrength;
+            ya *= waterEdgeStrength;
+
+            xa = std::min(midPoint, (double)xa);
+            ya = std::min(midPoint, (double)ya);
+
+            double gradientValue = 1.f - ((((double)xa / midPoint) * ((double)ya / midPoint)) /** 0.5*/);
+            gradient[x + y * intSize] = gradientValue;
+        }
+    }
+
     for (int y = 0; y < intSize; y++) {
         for (int x = 0; x < intSize; x++) {
             double warpNoise = perlin.octave2D_01(
@@ -26,7 +52,7 @@ const sf::Image Generator::generate() {
                 warpStrength * warpNoise, intOctaves
             );
 
-            data[x + y * intSize] = noise;
+            data[x + y * intSize] = noise - gradient[x + y * intSize];
 
             _progress = 
                 ((float)(x + y * intSize) / (float)(intSize * intSize));
@@ -86,23 +112,26 @@ const sf::Image Generator::process(const std::vector<double>& data, const siv::P
             double temperatureNoise = perlin.normalizedOctave3D_01((x + xOffset) * biomeSampleRate, (y + yOffset) * biomeSampleRate, 10, biomeOctaves);
             double precipitationNoise = perlin.normalizedOctave3D_01((x + xOffset) * biomeSampleRate, (y + yOffset) * biomeSampleRate, 40, biomeOctaves);
 
-            float tundraTemp = 0.460 + 0.0075;
-            float tundraPrecLow = 0.240 - 0.0075;
-            float tundraPrecHigh = 0.660 + 0.0075;
+            temperatureNoise += ((float)randomInt(-(int)biomeEdgeMixing, (int)biomeEdgeMixing)) / 100000.;
+            precipitationNoise += ((float)randomInt(-(int)biomeEdgeMixing, (int)biomeEdgeMixing)) / 100000.;
 
-            float jungleTemp = 0.540 - 0.0075;
-            float junglePrec = 0.460 + 0.0075;
+            const float biomeSize = 0.00075;
 
-            float savannaTemp = 0.540 - 0.0075;
-            float savannaPrecLow = 0.315 - 0.0075;
-            float savannaPrecHigh = 0.660 + 0.0075;
+            float tundraTemp = 0.460 + biomeSize;
+            float tundraPrecLow = 0.340 - biomeSize;
+            float tundraPrecHigh = 0.660 + biomeSize;
+
+            float jungleTemp = 0.540 - biomeSize;
+            float junglePrec = 0.460 + biomeSize;
+
+            float savannaTemp = 0.540 - biomeSize;
+            float savannaPrecLow = 0.315 - biomeSize;
+            float savannaPrecHigh = 0.660 + biomeSize;
 
             bool tundra = temperatureNoise < tundraTemp&& precipitationNoise >= tundraPrecLow && precipitationNoise < tundraPrecHigh;
             bool jungle = temperatureNoise > jungleTemp && precipitationNoise < junglePrec;
             bool savanna = temperatureNoise > savannaTemp && precipitationNoise >= savannaPrecLow && precipitationNoise < savannaPrecHigh;
 
-
-            //std::cout << temperatureNoise << " " << precipitationNoise << std::endl;
 
             if (rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_LOW || rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH) {
                 bool high = rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH;

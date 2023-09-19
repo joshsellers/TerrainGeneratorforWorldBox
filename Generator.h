@@ -57,6 +57,10 @@ public:
     double mountainMidRange = 0.1;
     double mountainHighRange = 0.2;
 
+    double waterEdgeStrength = 6.;
+
+    double biomeEdgeMixing = 250;
+
     float getProgress() const;
     bool isGenerating() const;
 

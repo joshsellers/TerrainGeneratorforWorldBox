@@ -103,6 +103,9 @@ void Program::uiSetup() {
     addTextField(xPos, 70, "mountains low: ", &_generator.mountainLowRange);
     addTextField(xPos, 75, "mountains high: ", &_generator.mountainMidRange);
     addTextField(xPos, 80, "snow caps: ", &_generator.mountainHighRange);
+
+    addTextField(xPos + 27, 10, "edge strength: ", &_generator.waterEdgeStrength);
+    addTextField(xPos + 27, 15, "biome edge mixing: ", &_generator.biomeEdgeMixing);
 }
 
 void Program::addTextField(int xPos, int yPos, std::string label, 
