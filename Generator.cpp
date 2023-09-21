@@ -36,7 +36,7 @@ const sf::Image Generator::generate() {
             xa = std::min(midPoint, (double)xa);
             ya = std::min(midPoint, (double)ya);
 
-            double gradientValue = 1.f - ((((double)xa / midPoint) * ((double)ya / midPoint)) /** 0.5*/);
+            double gradientValue = 1.f - ((((double)xa / midPoint) * ((double)ya / midPoint)));
             gradient[x + y * intSize] = gradientValue;
         }
     }
@@ -128,7 +128,7 @@ const sf::Image Generator::process(const std::vector<double>& data, const siv::P
             float savannaPrecLow = 0.315 - biomeSize;
             float savannaPrecHigh = 0.660 + biomeSize;
 
-            bool tundra = temperatureNoise < tundraTemp&& precipitationNoise >= tundraPrecLow && precipitationNoise < tundraPrecHigh;
+            bool tundra = temperatureNoise < tundraTemp && precipitationNoise >= tundraPrecLow && precipitationNoise < tundraPrecHigh;
             bool jungle = temperatureNoise > jungleTemp && precipitationNoise < junglePrec;
             bool savanna = temperatureNoise > savannaTemp && precipitationNoise >= savannaPrecLow && precipitationNoise < savannaPrecHigh;
 
@@ -137,11 +137,11 @@ const sf::Image Generator::process(const std::vector<double>& data, const siv::P
                 bool high = rgb == (sf::Uint32)TERRAIN_COLOR::DIRT_HIGH;
 
                 if (tundra) {
-                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SNOW_LOW : (sf::Uint32)TERRAIN_COLOR::SNOW_LOW;
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SNOW_HIGH : (sf::Uint32)TERRAIN_COLOR::SNOW_LOW;
                 } else if (jungle) {
                     rgb = high ? (sf::Uint32)TERRAIN_COLOR::JUNGLE_HIGH : (sf::Uint32)TERRAIN_COLOR::JUNGLE_LOW;
                 } else if (savanna) {
-                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SAVANNA_HIGH : (sf::Uint32)TERRAIN_COLOR::SAVANNA_HIGH;
+                    rgb = high ? (sf::Uint32)TERRAIN_COLOR::SAVANNA_HIGH : (sf::Uint32)TERRAIN_COLOR::SAVANNA_LOW;
                 } else {
                     rgb = high ? (sf::Uint32)TERRAIN_COLOR::GRASS_HIGH : (sf::Uint32)TERRAIN_COLOR::GRASS_LOW;
                 }

@@ -80,8 +80,13 @@ void Program::uiSetup() {
 
     std::shared_ptr<UIButton> saveButton = std::shared_ptr<UIButton>(
         new UIButton(15, 2, 8, 10, 5, 4.3, "Save", _font, this, "save")
-        );
+    );
     _uiElements.push_back(saveButton);
+
+    std::shared_ptr<UIButton> resetSeedButton = std::shared_ptr<UIButton>(
+        new UIButton(58, 2, 15, 10, 10.5, 4.3, "New Seed", _font, this, "seed")
+    );
+    _uiElements.push_back(resetSeedButton);
 
 
     // TEXT FIELDS
@@ -185,6 +190,13 @@ void Program::buttonPressed(std::string buttonCode) {
         generate();
     } else if (buttonCode == "save") {
         save();
+    } else if (buttonCode == "seed") {
+        srand(currentTimeMillis());
+        int newSeed = randomInt(10000, 99999);
+
+        _generator.seed = newSeed;
+        _textFields[0].get()->setValue(newSeed);
+        generate();
     }
 }
 
