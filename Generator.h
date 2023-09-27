@@ -44,10 +44,10 @@ public:
     double seed; // cast to siv::PerlinNoise::seed_type
 
     double octaves = 4; // cast to int 
-    double size = 1500; // cast to int
+    double size = 1700; // cast to int
     double sampleRate = 0.005;
 
-    double seaLevel = 0.5;
+    double seaLevel = 0.55;
 
     double oceanMidRange = 0.045;
     double oceanShallowRange = 0.01;
